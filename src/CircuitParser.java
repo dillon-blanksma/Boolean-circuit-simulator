@@ -1,9 +1,5 @@
 /*------------------------Class/Implementation Details--------------------------*
 
- * Azusa Pacific University, CS 445 - Computer Organization & Architecture		*
- * Source: CircuitParser.java (HardwareParser)									*
- * Original Code Author(s): Dan Grissom											*
- * Original Completion/Release Date: October 1, 2014							*
  *																				*
  * Details: Parses a circuit input file. This is not meant to be complete, but	*
  * rather is supposed to help get you started on your project. Feel free to		*
