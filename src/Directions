@@ -1,0 +1,140 @@
+Project 2 - Boolean Gate Level Simulator
+Book: A. Tanenbaum and T. Austin, Structured Computer Organization, 6th edition.
+Book Coverage: Up to Chapter 3, emphasis on Section 3.1.
+
+Topic Covered: This project covers basic boolean gates and combinational logic. This project
+will demonstrate how basic gates are formed to make more complex and specialized circuits. It
+will also reveal gate level propagation delays and enforce the concept and importance of a circuit’s critical path.
+
+Languages Allowed:
+C++ or Java
+
+Description
+HighLevel:
+Design a gatelevel simulator which can specify combinational logic networks and evaluate them given an appropriately sized
+bit vector as input. The simulator will read a combinational circuit from a file, as well as a bit vector pattern from a second file which will test/execute the circuit.
+The simulator will print/display the input sequence and output result of a combinational circuit
+(read from file), as well as the critical path
+delay of the circuit. More details are described below.
+The Problem:
+All the underlying functions that a computer can perform in hardware has some kind of logic
+associated with it. Chapter 3.2 of the book explains boolean gates and combinational circuits.
+Processors have algebraic logic units (ALUs) which compute basic computations such as
+integer addition, multiplication, and logical AND/OR operations. However, modern processors
+also have specialized circuitry called coprocessors which are typically optimized to perform a
+specific function much more efficiently than a sequence of ALU operations could perform the
+same function (e.g., hd video encoders/decoders, floating point operations); at the end of the
+day, these coprocessors boil down to some kind of logic (combinational or sequential) circuit.
+In the next project, you will design more complicated circuits with the simulator you develop in
+this project; however, in this project, your task is to design, implement and test three simple
+circuits in your boolean gatelevel
+simulator. Each of the three simple circuits must:
+1.) have at least 3 inputs.
+2.) have at least 5 boolean gates.
+3.) have at least 2 outputs.
+
+File Interface Requirements
+
+File 1:
+Will contain gate definitions and connections in the form below. Each definition will be on its own
+line so a parser can simply read the entire line and assume it is one statement (no semicolons
+needed or anything like that):
+
+IO(numInputs, numOutputs)
+
+/* number of inputs and outputs to the circuit */
+IOLABELS(uniqueCircuitInputLabel0, uniqueCircuitInputLabel1,...,uniqueCircuitOutputLabel0,
+uniqueCircuitOutputLabel1,...)
+/* the unique input and output labels for the circuit */
+
+GATE(type, uniqueGateLabel)
+/* type can be “NOT/NAND/NOR/AND/OR/XOR” and uniqueGateLabel should be a unique string
+not used to label any other gate or I/O in the entire circuit (i.e., file)*/
+
+CONN(uniqueLabelOut, outputPortNum, uniqueLabelIn, inputPortNum)
+/* makes a connection from the outputPortNum (integer) output of the gate labeled by
+uniqueLabelOut (string) to the inputPortNum (integer which can be any nonnegative
+integer, but will be 0 or 1 for all gates because all of our gates are two input) input of the gate labeled by
+uniqueLabelIn*/
+
+INPUT(uniqueCircuitInputLabel, uniqueLabelIn, inputPortNum)
+/* makes a connection from the current circuit’s input labeled by uniqueCircuitInputLabel to the
+inputPortNum input of the gate labeled by uniqueLabelIn; THE SAME CIRCUIT INPUT CAN
+DRIVE MULTIPLE GATE INPUTS...MAKE SURE TO TEST THIS*/
+
+OUTPUT(uniqueOutputLabel, outputPortNum, uniqueCircuitOutputLabel)
+/* makes a connection from the outputPortNum output of the gate labeled uniqueOutputLabel to
+the current circuit’s output labeled uniqueCircuitOutputLabel*/
+
+
+File 2:
+Will contain standard propagation times for the following gates (assume all times are an integer
+and represented in nanoseconds):
+
+NOT(timeInNanoSeconds)
+NAND(timeInNanoSeconds)
+NOR(timeInNanoSeconds)
+AND(timeInNanoSeconds)
+OR(timeInNanoSeconds)
+XOR(timeInNanoSeconds)
+
+
+File 3:
+Will contain the bit vectors for testing your circuit. Each vector will be on its own line so a parser
+can simply read the entire line and assume it is one vector. For example, a file for the
+coprocessor you will create in this project might look like:
+
+100
+110
+001
+101
+
+
+Do not assume you will always have the same number of inputs because the length of the vector
+(i.e., each line in File 3) will be equal to the number of inputs in the circuit you are testing. Thus,
+you should test your entire simulator using other simple circuits and bitvectors
+before attempting a more complex coprocessor.
+
+Design Requirements
+
+Your program should be very modular, use inheritance and adhere to the following rules:
+1.) You should have a base class called Executable which other classes inherit from
+  a.) Executable will have, a function called something similar to
+      signalInput(inputNumber, value, runningDelay)
+      i.) When this function is called, it will set the input value (0 or 1) for that
+          gate’s/circuit's input at inputNumber
+      ii.) It will also examine the runningDelay and determine if it is longer than
+          any other delays received from the other input(s); this is useful for
+          computing the critical path by propagating the delay through each path and
+          saving the longest delay at each gate
+      iii.) If all the inputs have been “signaled” in gate G, then we should signal
+          the inputs connected to G’s output
+          
+2.) You should have a Gate class which will inherit from the Executable class. The
+    reason for this is so you can have different types of gates and circuits all connected 
+    together in the same graph of Executables. It may seem like a pain now, but will make life
+    very easy once you build the basic infrastructure.
+  a.) You may have a variable for gateType inside Gate, which specifies
+      AND/OR/etc.; or, you could forgo the Gate class and have an AND class, an OR
+      class, etc.
+  b.) Your gate may simulate the transistor functions of the gate using a simple
+      C++/Java statement (e.g. if (Gate.gateType == AND) result = Gate.in[0] &&
+      Gate.in[1];)
+      
+3.) You should have a Circuit class which also inherits from Executable and essentially
+    contains the circuit described in File 1.
+    
+4.) In short, you should be able to read in an input vector from File 3, and then call
+    signalInput() on each of the input bits, which will propagate the signal through the circuit
+    and automatically display the output once all the signals have completely propagated
+    through the circuit (similar to breadth first search).
+
+5.) As a side note, you’ll need a way to reset the state of each executable, so you might
+    want to add a function to Executable such as flush(), and then overwrite this function in
+    Gate/Circuit such that it will erase any of the internal timing or signal data stored from the
+    last time the circuit was executed (this will be necessary to test multiple vectors back to
+    back). How you tell your circuits and all of their gates that a new signal is coming is up to
+    you, it’s just something you’ll need to do.
+    
+6.) YOU MUST USE A TREE STRUCTURE TO REPRESENT YOUR CIRCUIT.
+    TRUST ME.
